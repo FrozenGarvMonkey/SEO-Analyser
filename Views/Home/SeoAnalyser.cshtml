@@ -21,11 +21,6 @@
                 <input id="inputKeyword" type="text" placeholder="Enter Keywords (e.g. and, or, the, etc.)" class="form-control" />
 
                 <div class="form-check g-3">
-
-                    <div class="col">
-                        <input type="checkbox" name="disableAnalyse" id="disableAnalyse" value="disableAnalyse" class="text-center" />
-                        <label style="font-weight: normal;" for="disableAnalyse">Disable SEO Analyse</label>
-                    </div>
                 
                     <div class="col">
                         <input type="checkbox" name="disableExt" id="disableExt" value="disableExt" class="text-center" />
@@ -101,7 +96,6 @@
                     data: { 
                         url: urlStr,
                         keywordList: keywordList,
-                        disableAnalyse: $('#disableAnalyse').prop('checked'),
                         disableExt: $('#disableExt').prop('checked'),
                         disableMeta: $('#disableMeta').prop('checked'),
                         disableWord: $('#disableWord').prop('checked')
