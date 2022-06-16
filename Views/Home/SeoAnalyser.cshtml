@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Seo Analyser";
+}
+
+<div id="viewContent">
+    <h1 class="text-center bold">Seo Analyser</h1>
+
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <label class="control-label col-md-1">URL</label>
+            <div class="input-group col-md-11">
+                <input id="inputUrl" type="text" placeholder="Enter URL" class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-1">Keywords</label>
+
+            <div class="input-group col-md-11">
+                <input id="inputKeyword" type="text" placeholder="Enter Keywords (e.g. and, or, the, etc.)" class="form-control" />
+
+                <div class="form-check g-3">
+
+                    <div class="col">
+                        <input type="checkbox" name="disableAnalyse" id="disableAnalyse" value="disableAnalyse" class="text-center" />
+                        <label style="font-weight: normal;" for="disableAnalyse">Disable SEO Analyse</label>
+                    </div>
+                
+                    <div class="col">
+                        <input type="checkbox" name="disableExt" id="disableExt" value="disableExt" class="text-center" />
+                        <label style="font-weight: normal;" for="disableExt">Disable External Link Search</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="checkbox" name="disableMeta" id="disableMeta" value="disableMeta" class="text-center" />
+                        <label style="font-weight: normal;" for="disableMeta">Disable Meta Tag Search</label>
+                    </div>
+
+                    <div class="col">
+                        <input type="checkbox" name="disableWord" id="disableWord" value="disableWord" class="text-center" />
+                        <label style="font-weight: normal;" for="disableWord">Disable Word Search</label>
+                    </div>
+
+                </div>
+            </div>
+                        
+        </div>
+    </div>
+
+    <div id="message" style="color: red; text-align: center; margin-top: 2em; margin-bottom: 2em;"></div>
+    <div class="form-group text-center">
+        <button id="submit" class="btn btn-primary">Submit</button>
+        <button id="reset" class="btn btn-warning">Reset</button>
+    </div>
+
+    <div class="tab-content">
+        <div class="tab-pane fade in active table-responsive" id="tabResult">
+            <table id="datatableResult" class="table table-striped table-bordered" cellspacing="0" width="100%"></table>
+        </div>
+    </div>
+
+    <div class="textAlignCenter">
+        <img src="~/images/loading.gif" alt="" />
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+
+<script type="text/javascript" defer>
+    $(document).ready(function () {
+        LoadDatatable();
+
+        $("#reset").click(function (e) {
+            $("#inputUrl").val("");
+            $("#inputKeyword").val("");
+            $("#message").html("");
+            $("img").hide();
+            
+            $("#disableAnalyse").removeAttr('checked');
+            $("#disableExt").removeAttr('checked');
+            $("#disableMeta").removeAttr('checked');
+            $("#disableWord").removeAttr('checked');
+            ClearResult();
+        });
+
+        $("#submit").click(function (e) {
+            ClearResult();
+
+            var validate = Validate();
+            $("#message").html(validate);
+
+            var urlStr = $("#inputUrl").val();
+            var keywordList = $("#inputKeyword").val().split(',');
+
+            if (validate.length === 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/GetUrlSource",
+                    data: { 
+                        url: urlStr,
+                        keywordList: keywordList,
+                        disableAnalyse: $('#disableAnalyse').prop('checked'),
+                        disableExt: $('#disableExt').prop('checked'),
+                        disableMeta: $('#disableMeta').prop('checked'),
+                        disableWord: $('#disableWord').prop('checked')
+                    },
+                    dataType: "html",
+                    success: function (result, status, xhr) {
+                        ClearResult();
+
+                        var resultObj = JSON.parse(result);
+                        if (resultObj.data.length > 0) {
+                            resultObj.data.forEach(function (item) {
+                                $('#datatableResult').dataTable().fnAddData(item);
+                            });
+                        } else if (resultObj.errorMessage) {
+                            $("#message").html(resultObj.errorMessage);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $("#message").html("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            }
+        });
+
+        $(document).ajaxStart(function () {
+            $("img").show();
+        });
+
+        $(document).ajaxStop(function () {
+            $("img").hide();
+        });
+
+
+        function Validate() {
+            var errorMessage = "";
+            if ($("#inputUrl").val() === "") {
+                errorMessage += "Enter a URL! <br/> ";
+            }
+            if ($("#inputKeyword").val() === "") {
+                errorMessage += "Enter at least one keyword! <br/> ";
+            }
+            else if (!(isUrlValid($("#inputUrl").val()))) {
+                errorMessage += "Invalid URL! <br/>";
+            }
+
+            return errorMessage;
+        }
+
+        function isUrlValid(url) {
+            var urlregex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
+            return urlregex.test(url);
+        }
+
+        function ClearResult() {
+            $('#datatableResult').dataTable().fnClearTable();
+        }
+    });
+
+    function LoadDatatable() {
+        $('#datatableResult').DataTable({
+            "searching": true,
+            "ordering": true,
+            "bDestroy": true,
+            "bProcessing": true,
+            "responsive": true,
+            "ajax": {
+                "url": '@Url.Action("GetRecords", "Home")',
+                "type": "get",
+                "datatype": "json"
+            },
+            "columns": [
+                { "title": "Keyword", "data": "keyword" },
+                { "title": "Occurance", "data": "occurance" }
+            ]
+        });
+    }
+</script>

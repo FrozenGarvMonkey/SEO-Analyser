@@ -1,0 +1,22 @@
+﻿body {
+    font-family: "Consolas";
+    padding-top: 10em;
+    padding-bottom: 10em;
+}
+
+#viewContent input, #viewContent button {
+    font-size: 16px;
+}
+
+#viewContent h4 {
+    margin: 10px 0;
+}
+
+#viewContent .textAlignCenter {
+    text-align: center;
+}
+
+#viewContent .textAlignCenter img {
+    display: none;
+    width: 100px;
+}
