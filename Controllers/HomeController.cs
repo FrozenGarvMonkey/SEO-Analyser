@@ -11,6 +11,14 @@ using SEOAnalyser.Models;
 namespace SEOAnalyser.Controllers{
     public class HomeController : Controller{
 
+        public IActionResult Error(){
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult SeoAnalyser(){
+            return View();
+        }
+
         public JsonResult GetRecords(){
             return Json(new { data = new SeoResult() });
         }
@@ -51,31 +59,27 @@ namespace SEOAnalyser.Controllers{
                                         Occurance = wordCount
                                     });
                 }
-            }else{
-                if(!disableExt){
-                    var externalLinks = Regex.Matches(html, @"<(a|link).*?href=(""|')(.+?)(""|').*?>");
-                    seoResult.Add(new SeoResult{
-                                        Keyword = "External Link",
-                                        Occurance = externalLinks.Count
-                                    });
-                }
-                else{
-                    if(!disableMeta){
-                        var metaTag = new Regex(@"<meta\s*(?:(?:\b(\w|-)+\b\s*(?:=\s*(?:""[^""]*""|'" + @"[^']*'|[^""'<> ]+)\s*)?)*)/?\s*>", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
-                        var metaInformation = new Dictionary<string, string>();
+            }
+           
+            if(!disableExt){
+                var externalLinks = Regex.Matches(html, @"<(a|link).*?href=(""|')(.+?)(""|').*?>");
+                seoResult.Add(new SeoResult{
+                                    Keyword = "External Link",
+                                    Occurance = externalLinks.Count
+                                });
+            }
+           
+            if(!disableMeta){
+                var metaTag = new Regex(@"<meta\s*(?:(?:\b(\w|-)+\b\s*(?:=\s*(?:""[^""]*""|'" + @"[^']*'|[^""'<> ]+)\s*)?)*)/?\s*>", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+                var metaInformation = new Dictionary<string, string>();
 
-                        foreach (Match m in metaTag.Matches(html)){
-                            var metaContentTag = new Regex(@"(?<name>\b(\w|-)+\b)\" +
-                                                        @"s*=\s*(""(?<value>" +
-                                                        @"[^""]*)""|'(?<value>[^']*)'" +
-                                                        @"|(?<value>[^""'<> ]+)\s*)+",
-                                                            RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
-                            var matchs = metaContentTag.Match(m.Value.ToString());
-                        }
-                    }
-                    else{
-                        return Json(new {data = new SeoResult()});
-                    }
+                foreach (Match m in metaTag.Matches(html)){
+                    var metaContentTag = new Regex(@"(?<name>\b(\w|-)+\b)\" +
+                                                @"s*=\s*(""(?<value>" +
+                                                @"[^""]*)""|'(?<value>[^']*)'" +
+                                                @"|(?<value>[^""'<> ]+)\s*)+",
+                                                    RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+                    var matchs = metaContentTag.Match(m.Value.ToString());
                 }
             }
 
