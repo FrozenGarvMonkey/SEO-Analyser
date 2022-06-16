@@ -70,7 +70,7 @@ namespace SEOAnalyser.Controllers{
             }
 
             /* Meta Search Not Functional */           
-            /* if(!disableMeta){
+            if(!disableMeta){
                 var metaTag = new Regex(@"<meta\s*(?:(?:\b(\w|-)+\b\s*(?:=\s*(?:""[^""]*""|'" + @"[^']*'|[^""'<> ]+)\s*)?)*)/?\s*>", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
                 var metaInformation = new Dictionary<string, string>();
@@ -83,16 +83,16 @@ namespace SEOAnalyser.Controllers{
                                                 @"|(?<value>[^""'<> ]+)\s*)+",
                                                     RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
                     var matchs = metaContentTag.Match(m.Value.ToString());
-                    metaInformation.Add(m.Groups[1].Value, m.Groups[2].Value);
+                    metaInformation.Add(m.Groups[0].Value, m.Groups[1].Value);
                 }
 
-                foreach(var item in metaInformation.Values.GroupBy(x => x)){
+                foreach(var item in metaInformation.Values.GroupBy(x => x))
                       seoResult.Add(new SeoResult{
-                                        Keyword = item.Key,
+                                        Keyword = "Meta",
                                         Occurance = item.Count()
                                     });
-                }
-            } */
+                
+            }
 
             return seoResult;
         }
