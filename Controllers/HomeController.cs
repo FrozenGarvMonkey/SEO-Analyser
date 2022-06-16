@@ -69,7 +69,7 @@ namespace SEOAnalyser.Controllers{
                                 });
             }
 
-            /* Meta Search Not Functional */           
+            /* Meta Search Not Entirely Functional */           
             if(!disableMeta){
                 var metaTag = new Regex(@"<meta\s*(?:(?:\b(\w|-)+\b\s*(?:=\s*(?:""[^""]*""|'" + @"[^']*'|[^""'<> ]+)\s*)?)*)/?\s*>", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
@@ -88,7 +88,7 @@ namespace SEOAnalyser.Controllers{
 
                 foreach(var item in metaInformation.Values.GroupBy(x => x))
                       seoResult.Add(new SeoResult{
-                                        Keyword = "Meta",
+                                        Keyword = "Meta Tags",
                                         Occurance = item.Count()
                                     });
                 
