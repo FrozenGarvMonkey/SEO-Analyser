@@ -68,20 +68,31 @@ namespace SEOAnalyser.Controllers{
                                     Occurance = externalLinks.Count
                                 });
             }
-           
-            if(!disableMeta){
+
+            /* Meta Search Not Functional */           
+            /* if(!disableMeta){
                 var metaTag = new Regex(@"<meta\s*(?:(?:\b(\w|-)+\b\s*(?:=\s*(?:""[^""]*""|'" + @"[^']*'|[^""'<> ]+)\s*)?)*)/?\s*>", RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+
                 var metaInformation = new Dictionary<string, string>();
 
-                foreach (Match m in metaTag.Matches(html)){
+                foreach (Match m in metaTag.Matches(html))
+                {
                     var metaContentTag = new Regex(@"(?<name>\b(\w|-)+\b)\" +
                                                 @"s*=\s*(""(?<value>" +
                                                 @"[^""]*)""|'(?<value>[^']*)'" +
                                                 @"|(?<value>[^""'<> ]+)\s*)+",
                                                     RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
                     var matchs = metaContentTag.Match(m.Value.ToString());
+                    metaInformation.Add(m.Groups[1].Value, m.Groups[2].Value);
                 }
-            }
+
+                foreach(var item in metaInformation.Values.GroupBy(x => x)){
+                      seoResult.Add(new SeoResult{
+                                        Keyword = item.Key,
+                                        Occurance = item.Count()
+                                    });
+                }
+            } */
 
             return seoResult;
         }
